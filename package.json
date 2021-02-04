@@ -1,0 +1,22 @@
+{
+  "name": "moviekeep",
+  "version": "1.0.0",
+  "description": "Desktop app to keep track of movies",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WoutCherlet/moviekeep.git"
+  },
+  "author": "Wout Cher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WoutCherlet/moviekeep/issues"
+  },
+  "homepage": "https://github.com/WoutCherlet/moviekeep#readme",
+  "devDependencies": {
+    "electron": "^11.2.2"
+  }
+}
