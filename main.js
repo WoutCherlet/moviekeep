@@ -1,5 +1,5 @@
 const electron = require('electron')
-const { app, BrowserWindow, Menu, MenuItem } = electron
+const { app, BrowserWindow, Menu, ipcMain } = electron
 const path = require('path')
 
 let mainWindow;
@@ -16,22 +16,22 @@ function createMainWindow () {
   })
 
   //load in html file
-  mainWindow.loadFile('MainWindow.html')
+  mainWindow.loadFile('MainWindow.html');
 
   //quit app when closed
   mainWindow.on('closed', function(){
     app.quit();
-  })
+  });
 
   //create menu from template
-  const MainMenu = Menu.buildFromTemplate(mainMenuTemplate)
+  const MainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   //insert menu
-  Menu.setApplicationMenu(MainMenu)
+  Menu.setApplicationMenu(MainMenu);
 }
 
 
 //create main window when ready
-app.whenReady().then(createMainWindow)
+app.whenReady().then(createMainWindow);
 
 
 //Create AddWindow
@@ -45,13 +45,19 @@ function createAddWindow(){
     title: 'Add movie to list'
   })
 
-  addWindow.loadFile('AddWindow.html')
+  addWindow.loadFile('AddWindow.html');
 
   //free mem on close
   addWindow.on('close', function(){
     addWindow = null;
   });
 }
+
+//Catch item add
+ipcMain.on('item:add', function(event, item){
+  mainWindow.webContents.send('item:add', item);
+  addWindow.close();
+});
 
 //main menu template
 const mainMenuTemplate = [
@@ -104,13 +110,13 @@ if(process.env.NODE_ENV !== 'production'){
 //quit on close
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 //create window on activate
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow()
+    createMainWindow();
   }
-})
+});
