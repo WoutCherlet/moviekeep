@@ -71,8 +71,10 @@ const mainMenuTemplate = [
         }
       },
       {
-        label: "Delete Movie"
-        //TODO: on clock: delete movie window
+        label: "Delete Movie",
+        click(){
+          mainWindow.webContents.send('item:clear');
+        }
       },
       {
         label: "Quit",
