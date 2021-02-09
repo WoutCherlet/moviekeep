@@ -21,7 +21,7 @@ function createMainWindow () {
   
   //read in data from file (format item1, item2, ..)
   try {
-    var data = fs.readFileSync(path.resolve(__dirname, "data/data.txt")).toString();
+    const data = fs.readFileSync(path.resolve(__dirname, "data/data.txt")).toString();
     if (data != '' ){
       dataList = data.split(', ');
     }
@@ -82,6 +82,17 @@ ipcMain.on('item:add', function(event, item){
   mainWindow.webContents.send('item:add', item);
   addWindow.close();
 });
+
+//Catch item remove
+ipcMain.on('item:remove', function(event, item){
+  const index = dataList.indexOf(item.toString());
+  if (index > -1) {
+    dataList.splice(index, 1);
+  }else {
+    console.log("ERROR: dataList doesn't include item, this shouldn't happen");
+    console.log(item);
+  }
+})
 
 //main menu template
 const mainMenuTemplate = [
