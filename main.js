@@ -1,11 +1,15 @@
-const electron = require('electron')
-const { app, BrowserWindow, Menu, ipcMain } = electron
-const path = require('path')
+const electron = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = electron;
+const path = require('path');
+const fs = require('fs');
+
 
 let mainWindow;
 let addWindow;
+let dataList = [];
 
-//function to create main window
+
+//FUNCTION: create main window
 function createMainWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -14,9 +18,28 @@ function createMainWindow () {
       nodeIntegration: true
     }
   })
+  
+  //read in data from file (format item1, item2, ..)
+  try {
+    var data = fs.readFileSync(path.resolve(__dirname, "data/data.txt")).toString();
+    if (data != '' ){
+      dataList = data.split(', ');
+    }
+    console.log(dataList);
+  } catch (er) {
+    console.log('error caught: ' + er);
+  }
 
   //load in html file
   mainWindow.loadFile('MainWindow.html');
+
+  //add items from data to html file
+  mainWindow.webContents.on('did-finish-load', ()=>{
+    dataList.forEach(element => {
+      mainWindow.webContents.send('item:add', element.toString());
+    });
+  })
+
 
   //quit app when closed
   mainWindow.on('closed', function(){
@@ -34,7 +57,7 @@ function createMainWindow () {
 app.whenReady().then(createMainWindow);
 
 
-//Create AddWindow
+//FUNCTON: create add window
 function createAddWindow(){
   addWindow = new BrowserWindow({
     width: 300,
@@ -44,7 +67,7 @@ function createAddWindow(){
     },
     title: 'Add movie to list'
   })
-
+  
   addWindow.loadFile('AddWindow.html');
 
   //free mem on close
@@ -55,6 +78,7 @@ function createAddWindow(){
 
 //Catch item add
 ipcMain.on('item:add', function(event, item){
+  dataList.push(item);
   mainWindow.webContents.send('item:add', item);
   addWindow.close();
 });
@@ -73,6 +97,7 @@ const mainMenuTemplate = [
       {
         label: "Delete Movie",
         click(){
+          dataList = [];
           mainWindow.webContents.send('item:clear');
         }
       },
@@ -108,6 +133,18 @@ if(process.env.NODE_ENV !== 'production'){
     ]
   });
 }
+
+//save before quitting
+app.on('before-quit', () => {
+  let out = ''
+  dataList.forEach(element => {
+      out = out.concat(element + ', ');
+  });
+  out = out.slice(0, -2);
+  fs.writeFile(path.resolve(__dirname, "data/data.txt"), out,  (err) => { 
+      if (err) throw err; 
+  });
+});
 
 //quit on close
 app.on('window-all-closed', () => {
