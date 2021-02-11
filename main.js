@@ -2,6 +2,18 @@ const electron = require('electron');
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 const path = require('path');
 const fs = require('fs');
+const fetch = require('node-fetch')
+
+const API_KEY = '4cd2c4b3edf638857f86df429992e48d';
+const TEST_URL = 'https://api.themoviedb.org/3/movie/550?api_key=4cd2c4b3edf638857f86df429992e48d';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w185';
+
+
+//getting resource from placeholderJSON:
+fetch('https://jsonplaceholder.typicode.com/posts/1')
+  .then((response) => response.json())
+  .then((json) => console.log(json));
+
 
 
 let mainWindow;
@@ -25,7 +37,6 @@ function createMainWindow () {
     if (data != '' ){
       dataList = data.split(', ');
     }
-    console.log(dataList);
   } catch (er) {
     console.log('error caught: ' + er);
   }
@@ -51,11 +62,6 @@ function createMainWindow () {
   //insert menu
   Menu.setApplicationMenu(MainMenu);
 }
-
-
-//create main window when ready
-app.whenReady().then(createMainWindow);
-
 
 //FUNCTON: create add window
 function createAddWindow(){
@@ -144,6 +150,10 @@ if(process.env.NODE_ENV !== 'production'){
     ]
   });
 }
+
+//create main window when ready
+app.whenReady().then(createMainWindow);
+
 
 //save before quitting
 app.on('before-quit', () => {
