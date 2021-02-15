@@ -1,6 +1,6 @@
 const electron = require('electron');
 const {ipcRenderer} = electron;
-const ul = document.querySelector('ul');
+const ul = document.getElementById('items');
 
 
 //catch add
@@ -16,12 +16,6 @@ ipcRenderer.on('item:add', function(event, item){
     ul.appendChild(li);
 })
 
-
-
-//clear items
-ipcRenderer.on('item:clear', function(){
-    ul.innerHTML = '';
-})
 
 //removeitem
 function removeItem(event){

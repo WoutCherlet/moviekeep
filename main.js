@@ -10,14 +10,13 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w185';
 
 
 //getting resource from placeholderJSON:
-fetch('https://jsonplaceholder.typicode.com/posts/1')
-  .then((response) => response.json())
-  .then((json) => console.log(json));
+// fetch('https://jsonplaceholder.typicode.com/posts/1')
+//   .then((response) => response.json())
+//   .then((json) => console.log(json));
 
 
 
 let mainWindow;
-let addWindow;
 let dataList = [];
 
 
@@ -42,7 +41,7 @@ function createMainWindow () {
   }
 
   //load in html file
-  mainWindow.loadFile('MainWindow.html');
+  mainWindow.loadFile('CollectionTab.html');
 
   //add items from data to html file
   mainWindow.webContents.on('did-finish-load', ()=>{
@@ -51,34 +50,9 @@ function createMainWindow () {
     });
   })
 
-
   //quit app when closed
   mainWindow.on('closed', function(){
     app.quit();
-  });
-
-  //create menu from template
-  const MainMenu = Menu.buildFromTemplate(mainMenuTemplate);
-  //insert menu
-  Menu.setApplicationMenu(MainMenu);
-}
-
-//FUNCTON: create add window
-function createAddWindow(){
-  addWindow = new BrowserWindow({
-    width: 300,
-    height: 200,
-    webPreferences: {
-      nodeIntegration: true
-    },
-    title: 'Add movie to list'
-  })
-  
-  addWindow.loadFile('AddWindow.html');
-
-  //free mem on close
-  addWindow.on('close', function(){
-    addWindow = null;
   });
 }
 
@@ -86,7 +60,6 @@ function createAddWindow(){
 ipcMain.on('item:add', function(event, item){
   dataList.push(item);
   mainWindow.webContents.send('item:add', item);
-  addWindow.close();
 });
 
 //Catch item remove
@@ -100,41 +73,9 @@ ipcMain.on('item:remove', function(event, item){
   }
 })
 
-//main menu template
-const mainMenuTemplate = [
-  {
-    label:'File',
-    submenu: [
-      {
-        label: "Add Movie",
-        click(){
-          createAddWindow();
-        }
-      },
-      {
-        label: "Delete Movie",
-        click(){
-          dataList = [];
-          mainWindow.webContents.send('item:clear');
-        }
-      },
-      {
-        label: "Quit",
-        accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
-        click(){
-          app.quit();
-        }
-      }
-    ]
-  }
-];
-//if mac: extra empty object
-if(process.platform == 'darwin'){
-  mainMenuTemplate.unshift({});
-}
-//add developer tools if not in prod
+//add developer tools if not in prod, otherwise remove menu
 if(process.env.NODE_ENV !== 'production'){
-  mainMenuTemplate.push({
+  mainMenuTemplate = [{
     label: 'Developer Tools',
     submenu:[
       {
@@ -148,7 +89,13 @@ if(process.env.NODE_ENV !== 'production'){
         role: 'reload'
       }
     ]
-  });
+  }];
+  //create menu from template
+  const MainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+  //insert menu
+  Menu.setApplicationMenu(MainMenu);
+} else {  
+  mainWindow.setMenu(null)
 }
 
 //create main window when ready
