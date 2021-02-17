@@ -9,7 +9,7 @@ ipcRenderer.on('item:add', function(event, item){
     const itemText = document.createTextNode(item);
     li.appendChild(itemText);
     let button = document.createElement('button');
-    button.textContent = 'delete';
+    button.textContent = 'X';
     button.className = 'deleteItem';
     button.addEventListener('click', removeItem);
     li.appendChild(button);
