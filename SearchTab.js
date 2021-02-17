@@ -36,6 +36,11 @@ function showTitles(json) {
         const itemText = document.createTextNode(results[i].title + '\n');
         const li = document.createElement('li');
         li.appendChild(itemText);
+        let button = document.createElement('button');
+        button.textContent = 'Add';
+        button.className = 'addItem';
+        button.addEventListener('click', addItem);
+        li.appendChild(button);
         ul.appendChild(li);
     }
 }
@@ -43,4 +48,12 @@ function showTitles(json) {
 //build api url from searchterm
 function buildSearchURL(searchterm){
     return BASE_URL + API_KEY + '&query=' + encodeURIComponent(searchterm) + OPTS;
+}
+
+//add item
+function addItem(event){
+    //get listItem
+    const li = event.target.parentNode;
+    //send to main to update data, send text
+    ipcRenderer.send('item:add', li.childNodes[0].textContent);
 }

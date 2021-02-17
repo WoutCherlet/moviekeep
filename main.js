@@ -4,21 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const fetch = require('node-fetch')
 
-const API_KEY = '4cd2c4b3edf638857f86df429992e48d';
-const TEST_URL = 'https://api.themoviedb.org/3/movie/550?api_key=4cd2c4b3edf638857f86df429992e48d';
-const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w185';
-
-
-//getting resource from placeholderJSON:
-// fetch('https://jsonplaceholder.typicode.com/posts/1')
-//   .then((response) => response.json())
-//   .then((json) => console.log(json));
-
-
-
 let mainWindow;
 let dataList = [];
-
 
 //FUNCTION: create main window
 function createMainWindow () {
