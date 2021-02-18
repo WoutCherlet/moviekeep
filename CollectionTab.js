@@ -4,9 +4,10 @@ const ul = document.getElementById('items');
 
 
 //catch add
-ipcRenderer.on('item:add', function(event, item){
+ipcRenderer.on('item:add', function(event, movieObj){
     const li = document.createElement('li');
-    const itemText = document.createTextNode(item);
+    li.movie = movieObj;
+    const itemText = document.createTextNode(movieObj.title);
     li.appendChild(itemText);
     let button = document.createElement('button');
     button.textContent = 'X';
@@ -20,10 +21,11 @@ ipcRenderer.on('item:add', function(event, item){
 //removeitem
 function removeItem(event){
     //get listItem
-    const item = event.target.parentNode;
-    //send to main to update data, send text
-    ipcRenderer.send('item:remove', item.childNodes[0].textContent);
+    const li = event.target.parentNode;
+    const id = li.movie.id;
+    //send to main to update data, send id of movie to delete
+    ipcRenderer.send('item:remove', id);
     //remove from display
-    const list = item.parentNode;
-    list.removeChild(item);
+    const list = li.parentNode;
+    list.removeChild(li);
 }

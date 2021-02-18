@@ -28,20 +28,26 @@ function submitform(event){
 }
 
 function showTitles(json) {
-    const cont = document.getElementsByClassName('maincontent')[0];
+    console.log(json);
+    //get results from json
     results = json.results
-    const ul = document.getElementById('results');
-    ul.innerHTML = "";
+    const ol = document.getElementById('results');
+    //clear ol
+    ol.innerHTML = "";
     for (i=0; i<results.length; i++){
+        //create li with title result
         const itemText = document.createTextNode(results[i].title + '\n');
         const li = document.createElement('li');
         li.appendChild(itemText);
+        //create add button
         let button = document.createElement('button');
         button.textContent = 'Add';
         button.className = 'addItem';
+        //add json result as paramater
+        li.result = results[i];
         button.addEventListener('click', addItem);
         li.appendChild(button);
-        ul.appendChild(li);
+        ol.appendChild(li);
     }
 }
 
@@ -51,9 +57,9 @@ function buildSearchURL(searchterm){
 }
 
 //add item
-function addItem(event){
+function addItem(event, results){
     //get listItem
     const li = event.target.parentNode;
-    //send to main to update data, send text
-    ipcRenderer.send('item:add', li.childNodes[0].textContent);
+    //send to main to update data, send Object(json style)
+    ipcRenderer.send('item:add', li.result);
 }

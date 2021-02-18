@@ -5,7 +5,8 @@ const fs = require('fs');
 const fetch = require('node-fetch')
 
 let mainWindow;
-let dataList = [];
+//dataListJSON is object, form {id: JSONS, id: JSON, ...}
+let dataObject = {};
 
 //FUNCTION: create main window
 function createMainWindow () {
@@ -16,15 +17,17 @@ function createMainWindow () {
       nodeIntegration: true
     }
   })
-  
-  //read in data from file (format item1, item2, ..)
-  try {
-    const data = fs.readFileSync(path.resolve(__dirname, "data/data.txt")).toString();
-    if (data != '' ){
-      dataList = data.split(', ');
+  try{
+    if (fs.existsSync(path.resolve(__dirname, "data/collectionTEST.json"))){
+      //read in from json
+      const dataObject = JSON.parse(fs.readFileSync(path.resolve(__dirname, "data/collectionTEST.json")));
+      console.log(dataObject);
+      if(dataObject == ''){
+        dataObject = {};
+      }
     }
-  } catch (er) {
-    console.log('error caught: ' + er);
+  } catch(er){
+    console.log('error in reading json' + er);
   }
 
   //load in html file
@@ -32,9 +35,9 @@ function createMainWindow () {
 
   //add items from data to html file
   mainWindow.webContents.on('did-finish-load', ()=>{
-    dataList.forEach(element => {
-      mainWindow.webContents.send('item:add', element.toString());
-    });
+    for (const property in dataObject){
+      mainWindow.webContents.send('item:add', dataObject[property]);
+    }
   })
 
   //quit app when closed
@@ -44,20 +47,16 @@ function createMainWindow () {
 }
 
 //Catch item add
-ipcMain.on('item:add', function(event, item){
-  dataList.push(item);
-  mainWindow.webContents.send('item:add', item);
+ipcMain.on('item:add', function(event, movieObj){
+  const id = movieObj.id;
+  dataObject[id.toString()] = movieObj;
+  console.log(movieObj);
+  mainWindow.webContents.send('item:add', movieObj);
 });
 
 //Catch item remove
-ipcMain.on('item:remove', function(event, item){
-  const index = dataList.indexOf(item.toString());
-  if (index > -1) {
-    dataList.splice(index, 1);
-  }else {
-    console.log("ERROR: dataList doesn't include item, this shouldn't happen");
-    console.log(item);
-  }
+ipcMain.on('item:remove', function(event, id){
+  delete dataObject.id;
 })
 
 //add developer tools if not in prod, otherwise remove menu
@@ -91,13 +90,9 @@ app.whenReady().then(createMainWindow);
 
 //save before quitting
 app.on('before-quit', () => {
-  let out = ''
-  dataList.forEach(element => {
-      out = out.concat(element + ', ');
-  });
-  out = out.slice(0, -2);
-  fs.writeFile(path.resolve(__dirname, "data/data.txt"), out,  (err) => { 
-      if (err) throw err; 
+  //write to JSON
+  fs.writeFile(path.resolve(__dirname, "data/collectionTEST.json"), JSON.stringify(dataObject), (err) => { 
+    if (err) throw err; 
   });
 });
 
