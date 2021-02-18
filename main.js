@@ -20,8 +20,8 @@ function createMainWindow () {
   try{
     if (fs.existsSync(path.resolve(__dirname, "data/collectionTEST.json"))){
       //read in from json
-      const dataObject = JSON.parse(fs.readFileSync(path.resolve(__dirname, "data/collectionTEST.json")));
-      console.log(dataObject);
+      dataObject = JSON.parse(fs.readFileSync(path.resolve(__dirname, "data/collectionTEST.json")));
+      console.log("dataObject:" + dataObject);
       if(dataObject == ''){
         dataObject = {};
       }
@@ -36,6 +36,7 @@ function createMainWindow () {
   //add items from data to html file
   mainWindow.webContents.on('did-finish-load', ()=>{
     for (const property in dataObject){
+      console.log(dataObject[property])
       mainWindow.webContents.send('item:add', dataObject[property]);
     }
   })
@@ -56,7 +57,7 @@ ipcMain.on('item:add', function(event, movieObj){
 
 //Catch item remove
 ipcMain.on('item:remove', function(event, id){
-  delete dataObject.id;
+  delete dataObject[id.toString()];
 })
 
 //add developer tools if not in prod, otherwise remove menu
@@ -91,6 +92,7 @@ app.whenReady().then(createMainWindow);
 //save before quitting
 app.on('before-quit', () => {
   //write to JSON
+  console.log(JSON.stringify(dataObject));
   fs.writeFile(path.resolve(__dirname, "data/collectionTEST.json"), JSON.stringify(dataObject), (err) => { 
     if (err) throw err; 
   });
