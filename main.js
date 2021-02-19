@@ -21,7 +21,6 @@ function createMainWindow () {
     if (fs.existsSync(path.resolve(__dirname, "data/collectionTEST.json"))){
       //read in from json
       dataObject = JSON.parse(fs.readFileSync(path.resolve(__dirname, "data/collectionTEST.json")));
-      console.log("dataObject:" + dataObject);
       if(dataObject == ''){
         dataObject = {};
       }
@@ -36,7 +35,6 @@ function createMainWindow () {
   //add items from data to html file
   mainWindow.webContents.on('did-finish-load', ()=>{
     for (const property in dataObject){
-      console.log(dataObject[property])
       mainWindow.webContents.send('item:add', dataObject[property]);
     }
   })
@@ -51,7 +49,6 @@ function createMainWindow () {
 ipcMain.on('item:add', function(event, movieObj){
   const id = movieObj.id;
   dataObject[id.toString()] = movieObj;
-  console.log(movieObj);
   mainWindow.webContents.send('item:add', movieObj);
 });
 
@@ -92,7 +89,6 @@ app.whenReady().then(createMainWindow);
 //save before quitting
 app.on('before-quit', () => {
   //write to JSON
-  console.log(JSON.stringify(dataObject));
   fs.writeFile(path.resolve(__dirname, "data/collectionTEST.json"), JSON.stringify(dataObject), (err) => { 
     if (err) throw err; 
   });

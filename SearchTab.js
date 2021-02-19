@@ -35,10 +35,20 @@ function showTitles(json) {
     //clear ol
     ol.innerHTML = "";
     for (i=0; i<results.length; i++){
+        result = results[i];
         //create li with title result
-        const itemText = document.createTextNode(results[i].title + '\n');
+        const itemText = document.createTextNode(result.title + '\n');
         const li = document.createElement('li');
         li.appendChild(itemText);
+        //add image: get from db if path available, otherwise placeholder image
+        const image = document.createElement('img');
+        if (result.poster_path != null){
+            image.src = IMAGE_BASE_URL + result.poster_path;
+            image.alt = 'no poster found';
+        } else {
+            image.src = 'assets/missingimg.jpg'
+        }
+        li.appendChild(image);
         //create add button
         let button = document.createElement('button');
         button.textContent = 'Add';
@@ -47,6 +57,7 @@ function showTitles(json) {
         li.result = results[i];
         button.addEventListener('click', addItem);
         li.appendChild(button);
+        //add to list
         ol.appendChild(li);
     }
 }
